@@ -1,0 +1,38 @@
+name: Main CI
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+
+jobs:
+  static-check:
+    uses: ./.github/workflows/static-check.yml
+
+  golangci:
+    uses: ./.github/workflows/golangci.yml
+
+  build:
+    uses: ./.github/workflows/golangci.yml
+    needs: [ static-check, golangci]
+
+  go-test:
+    uses: ./.github/workflows/go-test.yml
+    needs: [ static-check, golangci ]
+    with:
+      MIN_COVERAGE: 50.0
+
+  migration:
+    uses: ./.github/workflows/migration.yml
+    needs: [ static-check, golangci ]
+    with:
+      DB_USER: "postgres"
+      DB_PASSWORD: "postgres"
+      DB_NAME: "testdb"
+      DB_HOST: "localhost"
+      DB_PORT: 5432
