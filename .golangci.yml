@@ -1,0 +1,7 @@
+linters:
+  enable:
+    - revive
+    - gocritic
+    - gosec
+    - staticcheck
+#    - golint
