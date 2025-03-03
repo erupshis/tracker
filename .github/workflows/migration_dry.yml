@@ -1,4 +1,4 @@
-name: migration
+name: migration-dry
 
 on:
   workflow_call:
@@ -21,7 +21,7 @@ on:
 
 jobs:
   check-migrations:
-    name: migrations
+    name: "migration: dry"
     runs-on: ubuntu-latest
 
     steps:
