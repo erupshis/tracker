@@ -17,6 +17,8 @@ vendor/
 # Dependency directories (remove the comment below to include it)
 bin/
 
+build/.env
+
 # IDEs directories
 .idea
 .vscode
