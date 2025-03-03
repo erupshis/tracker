@@ -24,8 +24,8 @@ lint:
 
 
 #///////////////_MIGRATIONS_/////////////////////
-migration: check-migration-name
-	goose -dir ./migrations create $(NAME) sql
+MIGRATION_DIR=./migrations
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/trackerdb?sslmode=disable
 
 # Check if MIGRATION_NAME is provided
 check-migration-name:
@@ -33,3 +33,15 @@ check-migration-name:
 		echo "Error: NAME is required"; \
 		exit 1; \
 	fi
+
+migration_create: check-migration-name
+	goose -dir ./migrations create $(NAME) sql
+
+migration_up:
+	goose postgres $(DATABASE_URL) -dir $(MIGRATION_DIR) up
+
+migration_down:
+	goose postgres $(DATABASE_URL) -dir $(MIGRATION_DIR) down
+
+migration_status:
+	goose postgres $(DATABASE_URL) -dir $(MIGRATION_DIR) status
