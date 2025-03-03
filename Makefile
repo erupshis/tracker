@@ -22,3 +22,14 @@ install-golangci-lint:
 lint:
 	$(GOPATH_BIN)/golangci-lint run --timeout=5m
 
+
+#///////////////_MIGRATIONS_/////////////////////
+migration: check-migration-name
+	goose -dir ./migrations create $(NAME) sql
+
+# Check if MIGRATION_NAME is provided
+check-migration-name:
+	@if [ -z "$(NAME)" ]; then \
+		echo "Error: NAME is required"; \
+		exit 1; \
+	fi
