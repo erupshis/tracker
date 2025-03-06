@@ -11,33 +11,37 @@ permissions:
 
 
 jobs:
+  load-env:
+    uses: ./.github/workflows/env.yml
+
   static-check:
-    uses: ./.github/workflows/sub/static-check.yml
+    uses: ./.github/workflows/static-check.yml
 
   golangci:
-    uses: ./.github/workflows/sub/golangci.yml
+    uses: ./.github/workflows/golangci.yml
+    needs: [load-env]
     with:
-      GO_VERSION: 1.24
+      GO_VERSION: ${{ needs.load-env.outputs.GO_VERSION }}
 
   build:
-    uses: ./.github/workflows/sub/build.yml
-    needs: [ static-check, golangci]
+    uses: ./.github/workflows/build.yml
+    needs: [static-check, golangci, load-env]
     with:
-      GO_VERSION: 1.24
+      GO_VERSION: ${{ needs.load-env.outputs.GO_VERSION }}
 
   go-test:
-    uses: ./.github/workflows/sub/go_test.yml
-    needs: [ static-check, golangci ]
+    uses: ./.github/workflows/go_test.yml
+    needs: [static-check, golangci]
     with:
       MIN_COVERAGE: 50.0
 
   migration-dry:
-    uses: ./.github/workflows/sub/migration_dry.yml
-    needs: [ static-check, golangci ]
+    uses: ./.github/workflows/migration_dry.yml
+    needs: [static-check, golangci, load-env]
     with:
-      DB_USER: "postgres"
-      DB_PASSWORD: "postgres"
-      DB_NAME: "testdb"
-      DB_HOST: "localhost"
-      DB_PORT: 5432
+      DB_USER: ${{ needs.load-env.outputs.DB_USER }}
+      DB_PASSWORD: ${{ needs.load-env.outputs.DB_PASSWORD }}
+      DB_NAME: ${{ needs.load-env.outputs.DB_NAME }}
+      DB_HOST: ${{ needs.load-env.outputs.DB_HOST }}
+      DB_PORT: ${{ needs.load-env.outputs.DB_PORT }}
 

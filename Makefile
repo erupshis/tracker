@@ -1,7 +1,14 @@
 
-.PHONY: build-container docker_up docker_down
-build-container:
-	docker build -t tracker -f build/Dockerfile .
+include ./build/.env
+export $(shell sed -n 's/^\([^#][^=]*\)=.*/\1/p' ./build/.env)
+
+.PHONY: build-docker
+build-docker:
+	docker build \
+		--build-arg GO_VERSION=${GO_VERSION} \
+		--file ./build/Dockerfile \
+		-t tracker \
+		.
 
 docker_down:
 	docker compose -f ./build/docker-compose.yaml stop && docker compose -f ./build/docker-compose.yaml down
