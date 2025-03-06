@@ -12,23 +12,27 @@ permissions:
 
 jobs:
   static-check:
-    uses: ./.github/workflows/static-check.yml
+    uses: ./.github/workflows/sub/static-check.yml
 
   golangci:
-    uses: ./.github/workflows/golangci.yml
+    uses: ./.github/workflows/sub/golangci.yml
+    with:
+      GO_VERSION: 1.24
 
   build:
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/sub/build.yml
     needs: [ static-check, golangci]
+    with:
+      GO_VERSION: 1.24
 
   go-test:
-    uses: ./.github/workflows/go_test.yml
+    uses: ./.github/workflows/sub/go_test.yml
     needs: [ static-check, golangci ]
     with:
       MIN_COVERAGE: 50.0
 
   migration-dry:
-    uses: ./.github/workflows/migration_dry.yml
+    uses: ./.github/workflows/sub/migration_dry.yml
     needs: [ static-check, golangci ]
     with:
       DB_USER: "postgres"
