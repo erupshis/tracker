@@ -2,18 +2,25 @@
 include ./build/.env
 export $(shell sed -n 's/^\([^#][^=]*\)=.*/\1/p' ./build/.env)
 
-.PHONY: build-docker
-build-docker:
+.PHONY: container
+container:
 	docker build \
 		--build-arg GO_VERSION=${GO_VERSION} \
 		--file ./build/Dockerfile \
 		-t tracker \
 		.
 
-docker_down:
-	docker compose -f ./build/docker-compose.yaml stop && docker compose -f ./build/docker-compose.yaml down
 
-docker_up:
+.PHONY: dc_stop
+dc_down:
+	docker compose -f ./build/docker-compose.yaml stop
+
+.PHONY: dc_down
+dc_down:
+	docker compose -f ./build/docker-compose.yaml down
+
+.PHONY: dc_up
+dc_up:
 	docker compose -f ./build/docker-compose.yaml up
 
 #////////////////_CHECK_CODE_/////////////////////
@@ -41,6 +48,7 @@ check-migration-name:
 		exit 1; \
 	fi
 
+.PHONY: migration_create
 migration_create: check-migration-name
 	goose -dir ./migrations create $(NAME) sql
 

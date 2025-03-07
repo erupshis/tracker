@@ -1,0 +1,27 @@
+# docker-compose.tracker.yml
+
+services:
+  tracker:
+    image: tracker:latest
+    container_name: tracker
+    build:
+      context: ../tracker
+      dockerfile: build/DockerFile
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      - postgres
+      - graylog
+    environment:
+      DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}"
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "tracker"

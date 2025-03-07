@@ -27,7 +27,10 @@ func main() {
 		_, _ = fmt.Fprintln(w, "READY")
 	})
 
-	log.Println("Starting server on port 8080...")
+	http.HandleFunc("/log", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		log.Printf("log current time: %s\n", time.Now().String())
+	})
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)

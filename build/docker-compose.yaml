@@ -1,38 +1,41 @@
 # docker-compose.yml
 
 services:
-  server:
-    image: tracker:latest
-    container_name: tracker
-    build:
-      context: .
-      dockerfile: build/DockerFile
-    restart: unless-stopped
-    ports:
-      - '8080:8080'
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/readyz" ]
-      interval: 5s
-      timeout: 3s
-      retries: 3
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}
+  tracker:
+    extends:
+      file: ./services/docker-compose.tracker.yml
+      service: tracker
 
   postgres:
-    image: postgres:17.4
-    container_name: postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - 5432:${DB_PORT}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    extends:
+      file: ./services/docker-compose.postgres.yml
+      service: postgres
+
+  mongodb:
+    extends:
+      file: ./services/docker-compose.graylog.yml
+      service: mongodb
+
+  graylog-datanode:
+    extends:
+      file: ./services/docker-compose.graylog.yml
+      service: graylog-datanode
+
+  graylog:
+    extends:
+      file: ./services/docker-compose.graylog.yml
+      service: graylog
 
 volumes:
   postgres_data:
     driver: local
+  mongodb_data:
+    driver: local
+  graylog-datanode:
+    driver: local
+  graylog_data:
+    driver: local
+  graylog_journal:
+    driver: local
+
+
