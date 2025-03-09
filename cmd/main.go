@@ -5,7 +5,26 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
+
+var (
+	// Define a new counter metric
+	requestCount = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "my_service_requests_total",
+			Help: "Total number of requests received",
+		},
+		[]string{"method", "status"}, // Optional labels
+	)
+)
+
+func init() {
+	// Register the counter metric with Prometheus
+	prometheus.MustRegister(requestCount)
+}
 
 func main() {
 	// Create a custom server with timeouts
@@ -30,6 +49,18 @@ func main() {
 	http.HandleFunc("/log", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		log.Printf("log current time: %s\n", time.Now().String())
+	})
+
+	// Expose metrics at /metrics endpoint
+	http.Handle("/metrics", promhttp.Handler())
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		// Increment the counter (for each request)
+		requestCount.WithLabelValues(r.Method, "200").Inc()
+
+		// Log and respond to the request
+		fmt.Fprintf(w, "Hello, World! Method: %s", r.Method)
 	})
 
 	if err := server.ListenAndServe(); err != nil {

@@ -20,6 +20,8 @@ services:
       - graylog
     environment:
       DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}"
+    networks:
+      - monitoring-net
     logging:
       driver: gelf
       options:

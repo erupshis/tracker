@@ -1,6 +1,7 @@
 # docker-compose.yml
 
 services:
+# SERVICE
   tracker:
     extends:
       file: ./services/docker-compose.tracker.yml
@@ -11,20 +12,47 @@ services:
       file: ./services/docker-compose.postgres.yml
       service: postgres
 
+# LOGGING
   mongodb:
     extends:
-      file: ./services/docker-compose.graylog.yml
+      file: ./observability/docker-compose.graylog.yml
       service: mongodb
 
   graylog-datanode:
     extends:
-      file: ./services/docker-compose.graylog.yml
+      file: ./observability/docker-compose.graylog.yml
       service: graylog-datanode
 
   graylog:
     extends:
-      file: ./services/docker-compose.graylog.yml
+      file: ./observability/docker-compose.graylog.yml
       service: graylog
+
+# METRICS
+  grafana:
+    extends:
+      file: ./observability/docker-compose.grafana.yml
+      service: grafana
+
+  prometheus:
+    extends:
+      file: ./observability/docker-compose.grafana.yml
+      service: prometheus
+
+  node-exporter:
+    extends:
+      file: ./observability/docker-compose.grafana.yml
+      service: node-exporter
+
+  alertmanager:
+    extends:
+      file: ./observability/docker-compose.grafana.yml
+      service: alertmanager
+
+  cadvisor:
+    extends:
+      file: ./observability/docker-compose.grafana.yml
+      service: cadvisor
 
 volumes:
   postgres_data:
@@ -37,5 +65,12 @@ volumes:
     driver: local
   graylog_journal:
     driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
 
+networks:
+  monitoring-net:
+    driver: bridge
 
