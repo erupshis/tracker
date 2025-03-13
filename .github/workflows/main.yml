@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
 
-concurrency:
+concurrency: # cancel previous workflows in branch.
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
@@ -48,3 +48,5 @@ jobs:
   publish:
     uses: ./.github/workflows/publish.yml
     needs: [ build, migration-dry ]
+    secrets: inherit
+    environment: stage
