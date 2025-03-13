@@ -15,15 +15,6 @@ concurrency: # cancel previous workflows in branch.
   cancel-in-progress: true
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug Branch Name
-        run: |
-          echo "Pull Request Head Ref: ${{ github.event.pull_request.head.ref }}"
-          echo "Pull Request Base Ref: ${{ github.event.pull_request.base.ref }}"
-          echo "Ref Name: ${{ github.ref_name }}"
-
   load-env:
     uses: ./.github/workflows/env.yml
 
