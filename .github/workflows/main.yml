@@ -5,6 +5,8 @@ on:
       - main
       - master
   pull_request:
+    branches:
+      - 'releases/**'
 
 permissions:
   contents: read
@@ -51,4 +53,4 @@ jobs:
     needs: [ build, migration-dry ]
     secrets: inherit
     with:
-      branch: ${{ github.ref_name }}
+      branch: ${{ github.event.pull_request.head.ref || github.ref_name }}

@@ -32,10 +32,11 @@ jobs:
             echo "VERSION=$VERSION" >> $GITHUB_ENV
           else
             echo "Branch name does not match the expected format (release/vX.Y.Z)"
-            exit 1
+            echo "SKIP_PUBLISH=true" >> $GITHUB_ENV
           fi
 
       - name: Create Git tag
+        if: env.VERSION != ''  # Skip if VERSION is not set
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
@@ -53,6 +54,7 @@ jobs:
           echo "GO_VERSION: ${{ env.GO_VERSION }}"
 
       - name: Build and push Docker image
+        if: env.VERSION != ''
         run: |
           make container GO_VERSION=${{ env.GO_VERSION }} && \
           docker tag tracker ${{ secrets.DOCKERHUB_USERNAME }}/tracker:latest && \
