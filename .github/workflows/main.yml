@@ -46,9 +46,3 @@ jobs:
       DB_NAME: ${{ needs.load-env.outputs.DB_NAME }}
       DB_HOST: ${{ needs.load-env.outputs.DB_HOST }}
       DB_PORT: ${{ needs.load-env.outputs.DB_PORT }}
-
-  publish:
-    uses: ./.github/workflows/publish.yml
-    needs: [build, migration-dry]
-    environment: production
-    if: success()
