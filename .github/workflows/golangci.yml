@@ -2,10 +2,6 @@ name: golangci
 
 on:
   workflow_call:
-    inputs:
-      GO_VERSION:
-        required: true
-        type: string
 
 jobs:
   golangci:
@@ -13,9 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Load environment from .env file
+        run: |
+          echo "GO_VERSION=$(grep GO_VERSION ./build/.env | cut -d '=' -f2)" >> $GITHUB_ENV
+
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.GO_VERSION }}
+          go-version: ${{ env.GO_VERSION }}
           cache: false
 
       - name: Run golangci-lint

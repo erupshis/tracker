@@ -1,7 +1,13 @@
-name: Migration-PROD
+name: Migration PROD
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: [ "Main CI" ]
+    types:
+      - completed
+  push:
+    tags:
+      - '*'
 
 jobs:
   manual-migration:
