@@ -6,9 +6,9 @@ on:
       - main
       - master
   pull_request:
-    branches:
-      - 'Release/**'  # Match branches starting with 'Release/'
-      - 'release/**'  # Match branches starting with 'release/'
+#    branches:
+#      - 'Release/**'  # Match branches starting with 'Release/'
+#      - 'release/**'  # Match branches starting with 'release/'
 
 permissions:
   contents: read
