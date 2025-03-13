@@ -46,7 +46,7 @@ jobs:
       DB_PORT: ${{ needs.load-env.outputs.DB_PORT }}
 
   publish:
+    name: publish docker image
     uses: ./.github/workflows/publish.yml
     needs: [ build, migration-dry ]
     secrets: inherit
-    environment: stage
