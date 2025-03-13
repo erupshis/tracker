@@ -24,8 +24,6 @@ jobs:
   golangci:
     uses: ./.github/workflows/golangci.yml
     needs: [load-env]
-    with:
-      GO_VERSION: ${{ needs.load-env.outputs.GO_VERSION }}
 
   build:
     uses: ./.github/workflows/build.yml
