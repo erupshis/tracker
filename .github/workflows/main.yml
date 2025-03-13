@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 
 jobs:
   load-env:
@@ -26,8 +30,6 @@ jobs:
   build:
     uses: ./.github/workflows/build.yml
     needs: [static-check, golangci, load-env]
-    with:
-      GO_VERSION: ${{ needs.load-env.outputs.GO_VERSION }}
 
   go-test:
     uses: ./.github/workflows/go_test.yml
@@ -45,3 +47,8 @@ jobs:
       DB_HOST: ${{ needs.load-env.outputs.DB_HOST }}
       DB_PORT: ${{ needs.load-env.outputs.DB_PORT }}
 
+  publish:
+    uses: ./.github/workflows/publish.yml
+    needs: [build, migration-dry]
+    environment: production
+    if: success()
