@@ -50,3 +50,5 @@ jobs:
     uses: ./.github/workflows/publish.yml
     needs: [ build, migration-dry ]
     secrets: inherit
+    with:
+      branch: ${{ github.ref_name }}
