@@ -1,4 +1,5 @@
 name: Main CI
+
 on:
   push:
     branches:
@@ -6,7 +7,8 @@ on:
       - master
   pull_request:
     branches:
-      - 'Release/**'
+      - 'Release/**'  # Match branches starting with 'Release/'
+      - 'release/**'  # Match branches starting with 'release/'
 
 permissions:
   contents: read
@@ -15,8 +17,16 @@ concurrency: # cancel previous workflows in branch.
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug Branch Name
+        run: |
+          echo "Pull Request Head Ref: ${{ github.event.pull_request.head.ref }}"
+          echo "Pull Request Base Ref: ${{ github.event.pull_request.base.ref }}"
+          echo "Ref Name: ${{ github.ref_name }}"
+
   load-env:
     uses: ./.github/workflows/env.yml
 
@@ -50,7 +60,7 @@ jobs:
   publish:
     name: publish docker image
     uses: ./.github/workflows/publish.yml
-    needs: [ build, migration-dry ]
+    needs: [build, migration-dry]
     secrets: inherit
     with:
       branch: ${{ github.event.pull_request.head.ref || github.ref_name }}
