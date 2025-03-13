@@ -1,0 +1,77 @@
+name: publish docker image
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch name'
+        required: true
+        type: string
+
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for Git tags
+          token: ${{ secrets.WORKFLOW_PUSH_TOKEN }}  # Use GITHUB_TOKEN for authentication
+
+      - name: Load environment from .env file
+        run: |
+          echo "GO_VERSION=$(grep GO_VERSION ./build/.env | cut -d '=' -f2)" >> $GITHUB_ENV
+
+      - name: Extract version from branch name
+        id: extract-version
+        run: |
+          BRANCH_NAME="${{ inputs.branch }}"
+          if [[ "$BRANCH_NAME" =~ ^release/(v[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            echo "Extracted version: $VERSION"
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+          else
+            echo "Branch name does not match the expected format (release/vX.Y.Z)"
+            echo "SKIP_PUBLISH=true" >> $GITHUB_ENV
+          fi
+
+      - name: Check if tag already exists
+        id: check-tag
+        run: |
+          git fetch --tags
+          if git tag --list | grep -q "$VERSION"; then
+          echo "Tag $VERSION already exists. Skipping tag push."
+          echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          else
+          echo "Tag $VERSION does not exist. Proceeding with tag push."
+          echo "TAG_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create Git tag
+        if: env.VERSION != '' && env.TAG_EXISTS == 'false'  # Skip if VERSION is not set or tag already exists
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin "$VERSION"
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Debug Info
+        run: |
+          echo "GO_VERSION: ${{ env.GO_VERSION }}"
+
+      - name: Build and push Docker image
+        if: env.VERSION != ''
+        run: |
+          make container GO_VERSION=${{ env.GO_VERSION }} && \
+          docker tag tracker ${{ secrets.DOCKERHUB_USERNAME }}/tracker:latest && \
+          docker tag tracker ${{ secrets.DOCKERHUB_USERNAME }}/tracker:$VERSION && \
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/tracker:latest && \
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/tracker:$VERSION
