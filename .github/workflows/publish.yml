@@ -32,6 +32,10 @@ jobs:
         with:
           name: tracker
           path: ./bin
+          workflow_run: ${{ github.event.workflow_run.id }}
+
+      - name: List downloaded files
+        run: ls -l bin
 
       - name: Debug Info
         run: |
