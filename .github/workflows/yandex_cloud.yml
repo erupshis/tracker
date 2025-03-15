@@ -1,0 +1,31 @@
+name: Deploy to Yandex Cloud
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Copy files to Yandex Cloud VM
+        run: |
+          scp -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_rsa \
+              ./build/docker-compose.yml \
+              ${{ secrets.YC_USER }}@${{ secrets.YC_VM_PUBLIC_IP }}:/home/${{ secrets.YC_USER }}/
+
+      - name: Deploy application
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_rsa \
+              ${{ secrets.YC_USER }}@${{ secrets.YC_VM_PUBLIC_IP }} \
+              "cd /home/${{ secrets.YC_USER }} && docker-compose down && docker-compose up -d"

@@ -53,3 +53,9 @@ jobs:
     secrets: inherit
     with:
       branch: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+  yandex_cloud:
+    name: deploy service to cloud
+    uses: ./.github/workflows/yandex_cloud.yml
+    needs: [publish]
+    secrets: inherit
