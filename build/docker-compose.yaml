@@ -13,20 +13,20 @@ services:
       service: postgres
 
 # LOGGING
-  mongodb:
-    extends:
-      file: ./observability/docker-compose.graylog.yml
-      service: mongodb
-
-  graylog-datanode:
-    extends:
-      file: ./observability/docker-compose.graylog.yml
-      service: graylog-datanode
-
-  graylog:
-    extends:
-      file: ./observability/docker-compose.graylog.yml
-      service: graylog
+#  mongodb:
+#    extends:
+#      file: ./observability/docker-compose.graylog.yml
+#      service: mongodb
+#
+#  graylog-datanode:
+#    extends:
+#      file: ./observability/docker-compose.graylog.yml
+#      service: graylog-datanode
+#
+#  graylog:
+#    extends:
+#      file: ./observability/docker-compose.graylog.yml
+#      service: graylog
 
 # METRICS
   grafana:
