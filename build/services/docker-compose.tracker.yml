@@ -2,11 +2,8 @@
 
 services:
   tracker:
-    image: tracker:latest
+    image: erupshis/tracker:v0.0.2
     container_name: tracker
-    build:
-      context: ../tracker
-      dockerfile: build/DockerFile
     restart: unless-stopped
     ports:
       - '8080:8080'
@@ -17,13 +14,13 @@ services:
       retries: 3
     depends_on:
       - postgres
-      - graylog
+    #      - graylog
     environment:
       DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}"
     networks:
       - monitoring-net
-    logging:
-      driver: gelf
-      options:
-        gelf-address: "udp://localhost:12201"
-        tag: "tracker"
+#    logging:
+#      driver: gelf
+#      options:
+#        gelf-address: "udp://localhost:12201"
+#        tag: "tracker"

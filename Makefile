@@ -13,15 +13,15 @@ container:
 
 .PHONY: dc_stop
 dc_down:
-	docker compose -f ./build/docker-compose.yaml stop
+	docker compose -f ./build/docker-compose.yml stop
 
 .PHONY: dc_down
 dc_down:
-	docker compose -f ./build/docker-compose.yaml down
+	docker compose -f ./build/docker-compose.yml down
 
 .PHONY: dc_up
 dc_up:
-	docker compose -f ./build/docker-compose.yaml up
+	docker compose -f ./build/docker-compose.yml up
 
 #////////////////_CHECK_CODE_/////////////////////
 # Makefile for Go project with golangci-lint
