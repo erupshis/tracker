@@ -1,18 +1,13 @@
 name: Migration PROD
 
 on:
-  workflow_run:
-    workflows: [ "Main CI" ]
-    types:
-      - completed
-  push:
-    tags:
-      - '*'
+  workflow_dispatch:
 
 jobs:
   manual-migration:
     name: "migration: prod"
     runs-on: ubuntu-latest
+#    environment: production
     steps:
       - uses: actions/checkout@v4
 
